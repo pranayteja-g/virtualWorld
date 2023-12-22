@@ -9,6 +9,12 @@ class Polygon {
         }
     }
 
+    static load(info) {
+        return new Polygon(
+            info.points.map((i) => new Point(i.x, i.y))
+        );
+    }
+
     static union(polys) {
         Polygon.multiBreak(polys);
         const keptSegments = [];
@@ -45,8 +51,12 @@ class Polygon {
         for (let i = 0; i < segs1.length; i++) {
             for (let j = 0; j < segs2.length; j++) {
                 const int = getIntersection(
-                    segs1[i].p1, segs1[i].p2, segs2[j].p1, segs2[j].p2
+                    segs1[i].p1,
+                    segs1[i].p2,
+                    segs2[j].p1,
+                    segs2[j].p2
                 );
+
                 if (int && int.offset != 1 && int.offset != 0) {
                     const point = new Point(int.x, int.y);
                     let aux = segs1[i].p2;
@@ -60,11 +70,11 @@ class Polygon {
         }
     }
 
-    distanceToPoint(point){
+    distanceToPoint(point) {
         return Math.min(...this.segments.map((s) => s.distanceToPoint(point)));
     }
 
-    distanceToPoly(poly){
+    distanceToPoly(poly) {
         return Math.min(...this.points.map((p) => poly.distanceToPoint(p)));
     }
 
@@ -102,11 +112,15 @@ class Polygon {
         }
     }
 
-    draw(ctx, { stroke = "blue", lineWidth = 2, fill = "rgba(0,0,255,0.3)" } = {}) {
+    draw(
+        ctx,
+        { stroke = "blue", lineWidth = 2, fill = "rgba(0,0,255,0.3)", join = "miter" } = {}
+    ) {
         ctx.beginPath();
         ctx.fillStyle = fill;
         ctx.strokeStyle = stroke;
         ctx.lineWidth = lineWidth;
+        ctx.lineJoin = join;
         ctx.moveTo(this.points[0].x, this.points[0].y);
         for (let i = 1; i < this.points.length; i++) {
             ctx.lineTo(this.points[i].x, this.points[i].y);
